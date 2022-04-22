@@ -6,6 +6,7 @@ import Message from "./components/message";
 import NotesContainer from "./components/notes/NotesContainer";
 import NotesList from "./components/notes/NotesList";
 import Note from "./components/notes/Note";
+import NoteForm from "./components/notes/NoteForm";
 
 function App() {
     const [notes, setNotes] = useState([]);
@@ -41,35 +42,57 @@ function App() {
         setContent("");
     }
 
+    //select note 
+    const selectedNoteHandler = (noteId) => {
+        setSelectedNote(noteId);
+        setCreating(false);
+        setEditing(false);
+    }
+
+    // Edit note
+    const editNoteHandler = (noteId) => {
+        const note = notes.find((note) => note.id === noteId);
+
+        setEditing(true);
+        setTitle(note.title);
+        setContent(note.content);
+    };
+
+    // update note
+    const updatedNote = () => {
+        const updatedNotes = [...notes];
+        const noteIndex = notes.findIndex(note => note.id === selectedNote);
+        updatedNotes[noteIndex] = {
+            id: selectedNote,
+            title: title,
+            content: content,
+        }
+        setNotes(updatedNotes);
+        setEditing(false);
+        setTitle("");
+        setContent("");
+    }
+
+    // add note
+    const addNoteHandler = () => {
+        setCreating(true);
+        setEditing(false);
+        setTitle("");
+        setContent("");
+
+    };
 
     const getAddNote = () => {
         return (
-            <div>
-                <h2>Add a new note</h2>
-                <div>
-                    <input
-                        type="text"
-                        name="title"
-                        className="form-input mb-30"
-                        placeholder="Title"
-                        value={title}
-                        onChange={changeTitleHandler}
-                    />
-
-                    <textarea
-                        rows="10"
-                        name="content"
-                        className="form-input"
-                        placeholder="Type your note here..."
-                        value={content}
-                        onChange={changeContentHandler}
-                    />
-
-                    <a href="#" className="button green" onClick={saveNoteHandler}>
-                        Add
-                    </a>
-                </div>
-            </div>
+            <NoteForm
+                fromTitle="Add Note"
+                title={title}
+                content={content}
+                titleChanged={changeTitleHandler}
+                contentChanged={changeContentHandler}
+                submitText="Add Note"
+                submitClicked={saveNoteHandler}
+            />
         );
     };
 
@@ -86,27 +109,45 @@ function App() {
         const note = notes.find((note) => {
             return note.id === selectedNote;
         })
+
+        let noteDisplay = (
+            <div>
+                <h2>{note.title}</h2>
+                <p>{note.content}</p>
+            </div>
+        )
+
+        if (editing) {
+            noteDisplay = (
+                <NoteForm
+                    fromTitle="edit Note"
+                    title={title}
+                    content={content}
+                    titleChanged={changeTitleHandler}
+                    contentChanged={changeContentHandler}
+                    submitText="edit"
+                    submitClicked={saveNoteHandler}
+                />
+            )
+        }
         return (
             <div>
-                <div className="note-operations">
-                    <a href="#">
-                        <i className="fa fa-pencil-alt" />
-                    </a>
-                    <a href="#">
-                        <i className="fa fa-trash" />
-                    </a>
-                </div>
-                <div>
-                    <h2>{note.title}</h2>
-                    <p>{note.content}</p>
-                </div>
+                {!editing &&
+                    <div className="note-operations">
+                        <a href="#" onClick={() => editNoteHandler(note.id)}>
+                            <i className="fa fa-pencil-alt" />
+                        </a>
+                        <a href="#">
+                            <i className="fa fa-trash" />
+                        </a>
+                    </div>
+                }
+                {noteDisplay}
             </div>
         );
     };
 
-    const addNoteHandler = () => {
-        setCreating(true);
-    };
+
 
     return (
         <div className="App">
@@ -117,7 +158,7 @@ function App() {
                             key={note.id}
                             title={note.title}
                             active={selectedNote === note.id}
-                            noteClicked={() => selectNoteHandler(note.id)}
+                            noteClicked={() => selectedNoteHandler(note.id)}
                         />
                     ))}
                 </NotesList>
