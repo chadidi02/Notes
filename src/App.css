@@ -1,45 +1,42 @@
-.App {
+html,
+body {
+	height: 100%;
+	margin: 0;
+}
+.notes {
 	display: flex;
+	height: 100%;
+}
+.notes__sidebar {
+	border-right: 2px solid #dddddd;
+	flex-shrink: 0;
+	overflow-y: auto;
+	padding: 1em;
+	width: 300px;
 }
 
-.preview-section {
-	height: 600px;
-	overflow: auto;
-}
-
-.notes-section {
-	position: relative;
-	width: 25%;
-	background-color: #595f68;
-}
-
-.preview-section {
-	position: relative;
-	width: 75%;
-	padding: 10px 75px;
-	box-sizing: border-box;
-}
-
-.add-btn {
-	position: absolute;
-	left: -20px;
-	top: 50%;
-	width: 45px;
-	height: 45px;
-	line-height: 28px;
-	background-color: #c82333;
-	text-align: center;
-	border-radius: 50%;
-	font-size: 30px;
-	border: 0;
+.add-note {
+	background: #009578;
+	border: none;
+	border-radius: 7px;
+	color: #ffffff;
 	cursor: pointer;
-	color: #fff;
-	outline: 0;
-	z-index: 10;
-	transform: translateY(-50%);
+	font-size: 1.25em;
+	font-weight: bold;
+	margin-bottom: 1em;
+	padding: 0.75em 0;
+	width: 100%;
+}
+.add-note:hover {
+	background: #00af8c;
 }
 
-.notes-list {
+.notes-list-item--selected {
+	background: #eeeeee;
+	border-radius: 7px;
+}
+
+.notes-list-item {
 	list-style: none;
 	padding: 0;
 	margin: 0;
@@ -47,29 +44,14 @@
 
 .note-item {
 	cursor: pointer;
-	padding: 12px 10px;
+	margin: 5px;
+	padding: 15px;
 	font-size: 15px;
-	color: #fff;
-	border-bottom: 0.5px solid #fff;
+	color: #000;
 }
 
 .note-item.active {
-	background-color: #573d7d;
-}
-
-.form-input {
-	display: block;
-	width: 100%;
-	padding: 0.7rem 0.75rem;
-	font-size: 1rem;
-	font-family: cairo;
-	line-height: 1.5;
-	color: #495057;
-	background-color: #fff;
-	background-clip: padding-box;
-	border: 1px solid #ced4da;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
+	background-color: #cfcbcb;
 }
 
 .note-operations {
@@ -85,44 +67,11 @@
 	color: #7b7777;
 }
 
-.button {
-	margin-top: 20px;
-	display: inline-block;
-	text-align: center;
-	text-decoration: none;
-	color: #fff;
-	padding: 5px 60px;
-	font-size: 20px;
-}
-
-.green {
-	background: #28a745;
-}
-
-.center {
-	text-align: center;
-}
-
-.alert-container {
-	position: fixed;
-	left: 10px;
-	top: 10px;
-	background: #f43a4c;
-	min-width: 250px;
-	border-radius: 5px;
-}
-
-.alert-container ul {
-	font-size: 14px;
-	color: #fff;
-}
-
 @media (max-width: 600px) {
-	.notes-section {
-		width: 30%;
+	.notes__sidebar {
+		width: 200px;
 	}
-	.preview-section {
-		width: 70%;
-		padding: 10px 30px;
+	.notes__preview {
+		padding: 1em 2em;
 	}
 }

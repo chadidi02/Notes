@@ -1,0 +1,16 @@
+.alert-container {
+	position: fixed;
+	left: 10px;
+	top: 10px;
+	background: #f43a4c;
+	padding: 15px;
+	min-width: 250px;
+	border-radius: 5px;
+}
+
+.alert-container li {
+	margin-left: 10px;
+	font-size: 14px;
+	color: #fff;
+	line-height: 1.9;
+}

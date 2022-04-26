@@ -1,0 +1,6 @@
+.notes__preview {
+	display: flex;
+	flex-direction: column;
+	padding: 2em 3em;
+	flex-grow: 1;
+}

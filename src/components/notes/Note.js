@@ -2,7 +2,7 @@ import React from 'react';
 
 const Note = (props) => {
     const { title, noteClicked, active } = props;
-    let classes = ['note-item'];
+    let classes = ['note-item', 'notes-list-item--selected'];
     if (active) {
         classes.push('active')
     }

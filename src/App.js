@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 
-import Preview from "./components/preview";
+import Preview from "./components/preview/Preview";
 import Message from "./components/message";
 import NotesContainer from "./components/notes/NotesContainer";
 import NotesList from "./components/notes/NotesList";
 import Note from "./components/notes/Note";
 import NoteForm from "./components/notes/NoteForm";
+import Alert from "./components/Alert";
+
 
 function App() {
     const [notes, setNotes] = useState([]);
@@ -15,6 +17,42 @@ function App() {
     const [selectedNote, setSelectedNote] = useState(null);
     const [creating, setCreating] = useState(false);
     const [editing, setEditing] = useState(false);
+    const [validationErrors, setValidationError] = useState([]);
+
+    useEffect(() => {
+        if (localStorage.getItem("notes")) {
+            setNotes(JSON.parse(localStorage.getItem("notes")));
+        } else {
+            localStorage.setItem("notes", JSON.stringify([]));
+        }
+    }, []);
+
+    useEffect(() => {
+        if (validationErrors.length > 0) {
+            setTimeout(() => {
+                setValidationError([]);
+            }, 2000);
+        }
+    }, [validationErrors]);
+
+    const saveToLocalStorage = (key, value) => {
+        localStorage.setItem(key, JSON.stringify(value));
+    };
+
+    const validate = () => {
+        const validationErrors = [];
+        let passed = true;
+        if (!title) {
+            validationErrors.push("Please enter the title of the note");
+            passed = false;
+        }
+        if (!content) {
+            validationErrors.push("Please enter the content of the note");
+            passed = false;
+        }
+        setValidationError(validationErrors);
+        return passed;
+    };
 
     // Change note title
     const changeTitleHandler = (event) => {
@@ -27,27 +65,30 @@ function App() {
 
     // Save note to local storage
     const saveNoteHandler = () => {
+        if (!validate()) return;
+
         const note = {
             id: new Date(),
             title: title,
             content: content,
-        }
+        };
 
-        const updatedNotes = [...notes, note];
+        const updateNotes = [...notes, note];
 
-        setNotes(updatedNotes);
+        saveToLocalStorage("notes", updateNotes);
+        setNotes(updateNotes);
         setCreating(false);
         setSelectedNote(note.id);
         setTitle("");
         setContent("");
-    }
+    };
 
-    //select note 
+    //select note
     const selectedNoteHandler = (noteId) => {
         setSelectedNote(noteId);
         setCreating(false);
         setEditing(false);
-    }
+    };
 
     // Edit note
     const editNoteHandler = (noteId) => {
@@ -59,19 +100,21 @@ function App() {
     };
 
     // update note
-    const updatedNote = () => {
-        const updatedNotes = [...notes];
-        const noteIndex = notes.findIndex(note => note.id === selectedNote);
-        updatedNotes[noteIndex] = {
+    const updateNoteHandler = () => {
+        if (!validate()) return;
+        const updateNotes = [...notes];
+        const noteIndex = notes.findIndex((note) => note.id === selectedNote);
+        updateNotes[noteIndex] = {
             id: selectedNote,
             title: title,
             content: content,
-        }
-        setNotes(updatedNotes);
+        };
+        saveToLocalStorage("notes", updateNotes);
+        setNotes(updateNotes);
         setEditing(false);
         setTitle("");
         setContent("");
-    }
+    };
 
     // add note
     const addNoteHandler = () => {
@@ -79,7 +122,18 @@ function App() {
         setEditing(false);
         setTitle("");
         setContent("");
+    };
 
+    // delete note
+    const deleteNoteHandler = () => {
+        const updateNotes = [...notes];
+        const noteIndex = updateNotes.findIndex(
+            (note) => note.id === selectedNote
+        );
+        notes.splice(noteIndex, 1);
+        saveToLocalStorage("notes", notes);
+        setNotes(notes);
+        setSelectedNote(null);
     };
 
     const getAddNote = () => {
@@ -99,23 +153,22 @@ function App() {
     const getPreview = () => {
         if (notes.length === 0) {
             return <Message title="no notes" />;
-
         }
 
         if (!selectedNote) {
-            return <Message title="select a note" />
+            return <Message title="select a note" />;
         }
 
         const note = notes.find((note) => {
             return note.id === selectedNote;
-        })
+        });
 
         let noteDisplay = (
             <div>
                 <h2>{note.title}</h2>
                 <p>{note.content}</p>
             </div>
-        )
+        );
 
         if (editing) {
             noteDisplay = (
@@ -126,47 +179,54 @@ function App() {
                     titleChanged={changeTitleHandler}
                     contentChanged={changeContentHandler}
                     submitText="edit"
-                    submitClicked={saveNoteHandler}
+                    submitClicked={updateNoteHandler}
                 />
-            )
+            );
         }
         return (
             <div>
-                {!editing &&
+                {!editing && (
                     <div className="note-operations">
                         <a href="#" onClick={() => editNoteHandler(note.id)}>
                             <i className="fa fa-pencil-alt" />
                         </a>
-                        <a href="#">
+                        <a href="#" onClick={deleteNoteHandler}>
                             <i className="fa fa-trash" />
                         </a>
                     </div>
-                }
+                )}
                 {noteDisplay}
             </div>
         );
     };
 
-
-
     return (
         <div className="App">
-            <NotesContainer className="notes-section">
-                <NotesList>
-                    {notes.map((note) => (
-                        <Note
-                            key={note.id}
-                            title={note.title}
-                            active={selectedNote === note.id}
-                            noteClicked={() => selectedNoteHandler(note.id)}
-                        />
-                    ))}
-                </NotesList>
-                <button className="add-btn" onClick={addNoteHandler}>
-                    +
-                </button>
-            </NotesContainer>
-            <Preview>{creating ? getAddNote() : getPreview()}</Preview>
+            <div className="notes">
+                <div className="notes__sidebar">
+                    <NotesContainer className="notes__sidebar">
+                        <button className="add-note" onClick={addNoteHandler}>
+                            Add Note
+                        </button>
+                        <NotesList>
+                            {notes.map((note) => (
+                                <Note
+                                    key={note.id}
+                                    title={note.title}
+                                    active={selectedNote === note.id}
+                                    noteClicked={() => selectedNoteHandler(note.id)}
+                                />
+                            ))}
+                        </NotesList>
+                    </NotesContainer>
+                </div>
+                <div className="notes__preview">
+                    <Preview>{creating ? getAddNote() : getPreview()}</Preview>
+                    {validationErrors.length !== 0 && (
+                        <Alert validationMessages={validationErrors} />
+                    )}
+                </div>
+            </div>
         </div>
     );
 }

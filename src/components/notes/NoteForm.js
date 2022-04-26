@@ -1,4 +1,5 @@
 import React from 'react';
+import './NoteForm.css';
 
 const NoteForm = (props) => {
     const { formTitle, title, content, titleChanged, contentChanged, submitClicked, submitText } = props;
@@ -9,8 +10,8 @@ const NoteForm = (props) => {
                 <input
                     type="text"
                     name="title"
-                    className="form-input mb-30"
-                    placeholder="العنوان"
+                    className="notes__title"
+                    placeholder="Enter a title..."
                     value={title}
                     onChange={titleChanged}
                 />
@@ -18,8 +19,8 @@ const NoteForm = (props) => {
                 <textarea
                     rows="10"
                     name="content"
-                    className="form-input"
-                    placeholder="النص"
+                    className="notes__body"
+                    placeholder="type"
                     onChange={contentChanged}
                     value={content}
                 />
